@@ -1,0 +1,12 @@
+.container { padding: 24px; display: flex; flex-direction: column; }
+.timeHeader { display: flex; align-items: flex-end; height: 32px; }
+.row { display: flex; align-items: center; height: 52px; border-bottom: 1px solid #e2e8f0; }
+.lbl { width: 120px; min-width: 120px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 4px; padding-right: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.timeBar { flex: 1; position: relative; height: 100%; }
+.timeMarker { position: absolute; top: 0; font-size: 11px; color: #64748b; transform: translateX(-50%); }
+.gridLine { position: absolute; top: 0; bottom: 0; width: 1px; background: #e2e8f0; }
+.block { position: absolute; top: 8px; bottom: 8px; border-radius: 4px; display: flex; align-items: center; padding: 0 6px; overflow: hidden; opacity: 0.85; }
+.block:hover { opacity: 1; }
+.blockLabel { font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty { display: flex; align-items: center; justify-content: center; min-height: 300px; color: #64748b; font-size: 15px; }

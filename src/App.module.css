@@ -1,0 +1,12 @@
+.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.body { display: flex; flex: 1; overflow: hidden; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.tabs { display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid #e2e8f0; background: #fff; height: 52px; gap: 0; }
+.tab { padding: 8px 24px; background: none; border: none; font-size: 14px; font-weight: 500; color: #64748b; border-bottom: 2px solid transparent; height: 52px; }
+.tab:hover { color: #1e293b; }
+.tabActive { color: #2563eb; border-bottom-color: #2563eb; font-weight: 600; }
+.content { flex: 1; overflow-y: auto; }
+.placeholder { display: flex; align-items: center; justify-content: center; min-height: 400px; color: #64748b; font-size: 16px; }
+.assignBtn { margin-left: auto; padding: 8px 20px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; }
+.assignBtn:hover:not(:disabled) { background: #1d4ed8; }
+.assignBtn:disabled { background: #94a3b8; cursor: not-allowed; }

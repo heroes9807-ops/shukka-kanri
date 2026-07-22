@@ -1,0 +1,15 @@
+.sidebar { width: 280px; min-width: 280px; background: #1e293b; color: #e2e8f0; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+.section { display: flex; flex-direction: column; gap: 8px; }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; }
+.sectionTitle { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
+.addBtn { font-size: 12px; padding: 4px 8px; background: #2563eb; color: #fff; border: none; border-radius: 6px; }
+.list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border-radius: 6px; }
+.item:hover { background: rgba(255,255,255,0.08); }
+.itemInfo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.itemName { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.itemMeta { font-size: 11px; color: #64748b; }
+.itemActions { display: flex; gap: 2px; opacity: 0; }
+.item:hover .itemActions { opacity: 1; }
+.iconBtn { background: none; border: none; font-size: 14px; padding: 2px 4px; border-radius: 4px; }
+.empty { font-size: 13px; color: #64748b; padding: 8px; text-align: center; }
