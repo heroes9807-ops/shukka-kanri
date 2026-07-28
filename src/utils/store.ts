@@ -31,7 +31,18 @@ export async function loadAppData(): Promise<AppData> {
   return {
     pickupPointsMaster: data.pickupPointsMaster ?? [],
     driversMaster: data.driversMaster ?? [],
-    schedules: data.schedules ?? [],
+    schedules: (data.schedules ?? []).map((s) => ({
+      ...s,
+      unassignedEntryIds: s.unassignedEntryIds ?? [],
+      // 過去バージョン(稼働時間が1枠のみ: startTime/endTime)からの移行にも対応
+      driverAvailability: (s.driverAvailability ?? []).map((a: any) => ({
+        driverId: a.driverId,
+        startTime1: a.startTime1 ?? a.startTime ?? "",
+        endTime1: a.endTime1 ?? a.endTime ?? "",
+        startTime2: a.startTime2 ?? "",
+        endTime2: a.endTime2 ?? "",
+      })),
+    })),
   };
 }
 

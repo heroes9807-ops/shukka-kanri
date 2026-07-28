@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>集荷ルート</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+  header {
+    background: #fff;
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  header h1 {
+    font-size: 18px;
+    margin: 0;
+  }
+  .nav-btn {
+    display: inline-block;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  #map {
+    width: 100%;
+    height: 45vh;
+    min-height: 260px;
+    border: 0;
+    display: block;
+  }
+  main {
+    padding: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  th, td {
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 13px;
+    border-bottom: 1px solid #eef2f6;
+  }
+  th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+  }
+  td.addr { color: #64748b; font-size: 12px; }
+  td.order { font-weight: 700; color: #2563eb; text-align: center; width: 28px; }
+  tr:last-child td { border-bottom: 0; }
+  .empty, .error {
+    padding: 40px 16px;
+    text-align: center;
+    color: #64748b;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="driverName">集荷ルート</h1>
+  <a id="navBtn" class="nav-btn" href="#" target="_blank" rel="noopener noreferrer">Googleマップでナビ開始</a>
+</header>
+<iframe id="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+<main>
+  <table id="stopsTable">
+    <thead>
+      <tr><th>#</th><th>回収先</th><th>住所</th><th>指定時間</th><th>お客様名</th></tr>
+    </thead>
+    <tbody id="stopsBody"></tbody>
+  </table>
+  <div id="emptyMsg" class="empty" style="display:none;">回収先がありません。</div>
+  <div id="errorMsg" class="error" style="display:none;">ルート情報を読み込めませんでした。URLが正しいか確認してください。</div>
+</main>
+<script>
+  var API_KEY = "AIzaSyBHncTziSmO-Nl6WD6kCP3c70050gO-4Is";
+
+  function base64UrlDecode(str) {
+    str = str.replace(/-/g, "+").replace(/_/g, "/");
+    while (str.length % 4) str += "=";
+    return decodeURIComponent(escape(atob(str)));
+  }
+
+  function render() {
+    var hash = window.location.hash.slice(1);
+    if (!hash) { document.getElementById("errorMsg").style.display = "block"; return; }
+
+    var data;
+    try {
+      data = JSON.parse(base64UrlDecode(hash));
+    } catch (e) {
+      document.getElementById("errorMsg").style.display = "block";
+      return;
+    }
+
+    document.getElementById("driverName").textContent = (data.d || "集荷ルート") + " さんの経路";
+    document.getElementById("navBtn").href = data.n || "#";
+
+    var stops = data.s || [];
+    var waypoints = stops.map(function (s) { return encodeURIComponent(s.a); }).join("|");
+    var origin = encodeURIComponent(data.o || "");
+    var destination = encodeURIComponent(data.e || data.o || "");
+    var mapUrl = "https://www.google.com/maps/embed/v1/directions?key=" + API_KEY +
+      "&origin=" + origin + "&destination=" + destination + "&mode=driving";
+    if (waypoints) mapUrl += "&waypoints=" + waypoints;
+    document.getElementById("map").src = mapUrl;
+
+    var body = document.getElementById("stopsBody");
+    if (stops.length === 0) {
+      document.getElementById("emptyMsg").style.display = "block";
+      document.getElementById("stopsTable").style.display = "none";
+      return;
+    }
+    stops.forEach(function (s, i) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td class=\"order\">" + (i + 1) + "</td>" +
+        "<td>" + escapeHtml(s.p || "") + "</td>" +
+        "<td class=\"addr\">" + escapeHtml(s.a || "") + "</td>" +
+        "<td>" + escapeHtml(s.t || "—") + "</td>" +
+        "<td>" + escapeHtml(s.c || "—") + "</td>";
+      body.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  render();
+</script>
+</body>
+</html>

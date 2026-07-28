@@ -1,25 +1,24 @@
-import { GoogleMap, useJsApiLoader, Marker, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, Marker, DirectionsRenderer } from "@react-google-maps/api";
 import { useState, useEffect } from "react";
 import type { PickupPoint, Driver, DriverRoute, DailyPickupEntry } from "../types";
 
-const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 const COLORS = ["#2563eb", "#059669", "#d97706", "#dc2626", "#7c3aed"];
 const CENTER = { lat: 35.6762, lng: 139.6503 };
-const LIBRARIES: ("places" | "geometry")[] = [];
 
 interface MapViewProps {
   entries: DailyPickupEntry[];
   pickupPointsMaster: PickupPoint[];
   drivers: Driver[];
   routes: DriverRoute[];
+  isLoaded: boolean;
 }
 
-export function MapView({ entries, pickupPointsMaster, drivers, routes }: MapViewProps) {
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: API_KEY, libraries: LIBRARIES });
+export function MapView({ entries, pickupPointsMaster, drivers, routes, isLoaded }: MapViewProps) {
   const [directions, setDirections] = useState<Record<string, google.maps.DirectionsResult>>({});
 
   useEffect(() => {
     if (!isLoaded || routes.length === 0) return;
+    setDirections({});
     const svc = new google.maps.DirectionsService();
     routes.forEach((route) => {
       const driver = drivers.find((d) => d.id === route.driverId);
@@ -55,26 +54,49 @@ export function MapView({ entries, pickupPointsMaster, drivers, routes }: MapVie
     .filter(Boolean) as PickupPoint[];
 
   return (
-    <GoogleMap
-      mapContainerStyle={{ width: "100%", height: "100%" }}
-      center={CENTER}
-      zoom={12}
-    >
-      {activePoints.map((p) => (
-        p.lat && p.lng ? (
-          <Marker key={p.id} position={{ lat: p.lat, lng: p.lng }} title={p.name} />
-        ) : null
-      ))}
-      {Object.entries(directions).map(([driverId, result], i) => (
-        <DirectionsRenderer
-          key={driverId}
-          directions={result}
-          options={{
-            polylineOptions: { strokeColor: COLORS[i % COLORS.length], strokeWeight: 4 },
-            suppressMarkers: false,
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <GoogleMap
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        center={CENTER}
+        zoom={12}
+      >
+        {activePoints.map((p) => (
+          p.lat && p.lng ? (
+            <Marker key={p.id} position={{ lat: p.lat, lng: p.lng }} title={p.name} />
+          ) : null
+        ))}
+        {drivers.map((driver, i) => {
+          const result = directions[driver.id];
+          if (!result) return null;
+          return (
+            <DirectionsRenderer
+              key={driver.id}
+              directions={result}
+              options={{
+                polylineOptions: { strokeColor: COLORS[i % COLORS.length], strokeWeight: 4 },
+                suppressMarkers: false,
+              }}
+            />
+          );
+        })}
+      </GoogleMap>
+      {drivers.length > 0 && (
+        <div
+          style={{
+            position: "absolute", top: 12, right: 12, background: "#fff",
+            borderRadius: 8, padding: "10px 14px", boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+            fontSize: 13, minWidth: 120,
           }}
-        />
-      ))}
-    </GoogleMap>
+        >
+          <div style={{ fontWeight: 700, marginBottom: 6, color: "#334155" }}>ドライバー</div>
+          {drivers.map((driver, i) => (
+            <div key={driver.id} style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+              <span style={{ width: 16, height: 4, borderRadius: 2, background: COLORS[i % COLORS.length], display: "inline-block", flexShrink: 0 }} />
+              <span style={{ color: "#334155" }}>{driver.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

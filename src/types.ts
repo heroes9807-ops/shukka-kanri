@@ -54,11 +54,26 @@ export interface DriverRoute {
 // ============================================
 // 日付ごとのスケジュール(その日のエントリー・ドライバー・ルートをまとめる)
 // ============================================
+/**
+ * ドライバーの「その日だけ」の稼働可能時間(日によって変わるためDailySchedule側で管理)。
+ * 午前だけ・夕方だけのように分かれて稼働する人がいるため、時間帯を2つまで持てる。
+ * 両方とも空文字の場合は制限なし(いつでも稼働可能)として扱う。2つ目が空なら1つ目のみで判定する。
+ */
+export interface DriverDayAvailability {
+  driverId: string;
+  startTime1: string; // "HH:mm"
+  endTime1: string;   // "HH:mm"
+  startTime2: string; // "HH:mm"
+  endTime2: string;   // "HH:mm"
+}
+
 export interface DailySchedule {
   date: string;                // "YYYY-MM-DD"
   entries: DailyPickupEntry[];
   driverIds: string[];         // その日使用するドライバーのID一覧
+  driverAvailability: DriverDayAvailability[]; // その日使用するドライバーの稼働可能時間
   routes: DriverRoute[];
+  unassignedEntryIds: string[]; // ドライバー不足・時間重複等で割り振れなかったエントリー(DailyPickupEntry.id)
 }
 
 // ============================================

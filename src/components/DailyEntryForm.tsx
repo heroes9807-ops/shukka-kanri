@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { DailyPickupEntry, PickupPoint } from "../types";
+import { TimeSelect } from "./TimeSelect";
 import styles from "./PickupForm.module.css";
 
 interface DailyEntryFormProps {
@@ -7,37 +8,6 @@ interface DailyEntryFormProps {
   initial?: DailyPickupEntry | null;
   onSave: (d: { timeWindowStart: string; timeWindowEnd: string; customerName: string; note: string }) => void;
   onCancel: () => void;
-}
-
-const HOURS = Array.from({ length: 15 }, (_, i) => String(i + 8).padStart(2, "0"));
-const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
-
-function splitTime(value: string): { h: string; m: string } {
-  if (!value) return { h: "", m: "" };
-  const [h, m] = value.split(":");
-  return { h: h ?? "", m: m ?? "" };
-}
-
-function joinTime(h: string, m: string): string {
-  if (!h && !m) return "";
-  return (h || "08") + ":" + (m || "00");
-}
-
-function TimeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
-  const { h, m } = splitTime(value);
-  return (
-    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-      <select className={styles.input} value={h} onChange={(e) => onChange(joinTime(e.target.value, m))}>
-        <option value="">--</option>
-        {HOURS.map((hh) => <option key={hh} value={hh}>{hh}</option>)}
-      </select>
-      <span>:</span>
-      <select className={styles.input} value={m} onChange={(e) => onChange(joinTime(h, e.target.value))}>
-        <option value="">--</option>
-        {MINUTES.map((mm) => <option key={mm} value={mm}>{mm}</option>)}
-      </select>
-    </div>
-  );
 }
 
 export function DailyEntryForm({ pickupPoint, initial, onSave, onCancel }: DailyEntryFormProps) {
@@ -65,11 +35,11 @@ export function DailyEntryForm({ pickupPoint, initial, onSave, onCancel }: Daily
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label}>開始時間</label>
-            <TimeSelect value={timeWindowStart} onChange={setTimeWindowStart} />
+            <TimeSelect value={timeWindowStart} onChange={setTimeWindowStart} selectClassName={styles.input} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>終了時間</label>
-            <TimeSelect value={timeWindowEnd} onChange={setTimeWindowEnd} />
+            <TimeSelect value={timeWindowEnd} onChange={setTimeWindowEnd} selectClassName={styles.input} />
           </div>
         </div>
         <div className={styles.field}>
